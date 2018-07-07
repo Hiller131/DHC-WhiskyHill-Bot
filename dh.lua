@@ -16,11 +16,9 @@ imagePath = localPath .. "/" .. "images"
 ------ 1 -----
 MaxLevelList[index] = {target =  "MaxLevel.png", region = Region(497, 591, 600, 600), id = "1", action = 'click'}
 index = index + 1
-
 ------ 2 -----
 MaxLevelList[index] = {target =  "MaxLevel.png", region = Region(1052, 353, 600, 600), id = "2", action = 'click'}
 index = index + 1
-
 ------ 3 -----
 MaxLevelList[index] = {target =  "MaxLevel.png", region = Region(1060, 647, 600, 600), id = "3", action = 'click'}
 index = index + 1
@@ -42,7 +40,7 @@ index = index + 1
 farmList[index] = {target =  "close.png", region = Region(1858, 95, 300, 300), id = "close", action = 'click', sleep = 0}
 index = index + 1
 ------ replay -----
-farmList[index] = {target =  "replay.png", region = Region(1547, 1155, 300, 300), id = "replay", action = 'click', sleep = 60}
+farmList[index] = {target =  "replay.png", region = Region(1547, 1155, 300, 300), id = "replay", action = 'click', sleep = 0}
 index = index + 1
 ------ sell small2 -----
 farmList[index] = {target =  "sell_small2.png", region = Region(829, 841, 300, 300), id = "sell_small2", action = 'click', sleep = 0}
@@ -104,11 +102,11 @@ index = index + 1
 bossList[index] = {target =  "yes.png", region = Region(1366, 791, 300, 300), id = "yes", action = 'click', sleep = 0}
 index = index + 1
 ------ sell small -----
-bossList[index] = {target =  "sell_small.png", region = Region(848, 853, 300, 300), id = "sell_small", action = 'click', sleep = 0}
-index = index + 1
+--bossList[index] = {target =  "sell_small.png", region = Region(848, 853, 300, 300), id = "sell_small", action = 'click', sleep = 0}
+--index = index + 1
 ------ sell -----
-bossList[index] = {target =  "sell.png", region = Region(1368, 796, 300, 300), id = "sell", action = 'click', sleep = 0}
-index = index + 1
+--bossList[index] = {target =  "sell.png", region = Region(1368, 796, 300, 300), id = "sell", action = 'click', sleep = 0}
+--index = index + 1
 ------ close -----
 bossList[index] = {target =  "close.png", region = Region(1858, 95, 300, 300), id = "close", action = 'click', sleep = 0}
 index = index + 1
@@ -116,16 +114,18 @@ index = index + 1
 bossList[index] = {target =  "replay2.png", region = Region(1300, 1180, 300, 300), id = "replay", action = 'click', sleep = 60}
 index = index + 1
 ------ sell small2 -----
-bossList[index] = {target =  "sell_small2.png", region = Region(829, 841, 300, 300), id = "sell_small2", action = 'click', sleep = 0}
-index = index + 1
+--bossList[index] = {target =  "sell_small2.png", region = Region(829, 841, 300, 300), id = "sell_small2", action = 'click', sleep = 0}
+--index = index + 1
 ------ ok -----
 bossList[index] = {target =  "ok.png", region = Region(1141, 838, 300, 300), id = "ok", action = 'click', sleep = 0}
+index = index + 1
+------ ok get gear -----
+bossList[index] = {target =  "ok.png", region = Region(1366, 791, 300, 300), id = "okGear", action = 'click', sleep = 0}
 index = index + 1
 
 function boss()
 	while true do
 		local length = table.getn(bossList)
-		
 		setImagePath(imagePath)
 		
 		for i = 1, length do
@@ -133,7 +133,7 @@ function boss()
 			if (t.action == "click") then
 				if (debug and t.region) then 
 					toast(t.target)
-					t.region:highlight(1)
+					t.region:highlight(2)
 				end
 				if (t.region and (t.region):existsClick(t.target, 0)) then
 					wait(t.sleep)
