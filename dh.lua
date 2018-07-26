@@ -6,12 +6,20 @@ Settings:setScriptDimension(true, scriptDimension)
 Settings:setCompareDimension(true, scriptDimension)
 setImmersiveMode(immersive)
 local index = 1
+local gearStars = 0
+local timer = 0
+local timeLeft = 0
+local timeInMinutes = 0
 farmList = {}
 bossList = {}
 arenaList = {}
 MaxLevelList = {}
 localPath = scriptPath()
 imagePath = localPath .. "/" .. "images"
+
+refillRegion = Region(1167, 662, 600, 600)
+refillOkRegion = Region(1107, 660, 600, 600)
+resultRegion = Region(1580, 200, 700, 250)
 
 ------ 1 -----
 MaxLevelList[index] = {target =  "MaxLevel.png", region = Region(497, 591, 600, 600), id = "1", action = 'click'}
@@ -54,12 +62,7 @@ index = index + 1
 ------ Auto On -----
 farmList[index] = {target =  "AutoOn.png", region = Region(916, 984, 600, 600), id = "AutoOn", action = 'click', sleep = 0}
 index = index + 1
------- Refill ------
-farmList[index] = {target =  "Refill.png", region = Region(1167, 662, 600, 600), id = "refill", action = 'click', sleep = 0}
-index = index + 1
------- Refill OK ------
-farmList[index] = {target =  "RefillOK.png", region = Region(1107, 660, 600, 600), id = "refillOk", action = 'click', sleep = 0}
-index = index + 1
+
 
 function farm()
 	while true do
@@ -67,6 +70,8 @@ function farm()
 		local MaxLevelLength = table.getn(MaxLevelList)
 		
 		setImagePath(imagePath)
+		
+		showBattleResult()
 		
 		for i = 1, length do
 			local t = farmList[i]
@@ -91,6 +96,11 @@ function farm()
 			end	
 			wait(.5)
 		end
+		-- Check for energy refill
+		if refillEnergy then
+			refillRegion:existsClick(Pattern("Refill.png"), 0.1)
+			refillOkRegion:existsClick(Pattern("RefillOK.png"), 0.1)
+		end
 	end
 end
 
@@ -111,7 +121,7 @@ index = index + 1
 bossList[index] = {target =  "close.png", region = Region(1858, 95, 300, 300), id = "close", action = 'click', sleep = 0}
 index = index + 1
 ------ replay -----
-bossList[index] = {target =  "replay2.png", region = Region(1300, 1180, 300, 300), id = "replay", action = 'click', sleep = 60}
+bossList[index] = {target =  "replay2.png", region = Region(1300, 1180, 300, 300), id = "replay", action = 'click', sleep = 00}
 index = index + 1
 ------ sell small2 -----
 --bossList[index] = {target =  "sell_small2.png", region = Region(829, 841, 300, 300), id = "sell_small2", action = 'click', sleep = 0}
@@ -122,24 +132,47 @@ index = index + 1
 ------ ok get gear -----
 bossList[index] = {target =  "ok.png", region = Region(1366, 791, 300, 300), id = "okGear", action = 'click', sleep = 0}
 index = index + 1
+------ Auto On -----
+bossList[index] = {target =  "AutoOn.png", region = Region(916, 984, 600, 600), id = "AutoOn", action = 'click', sleep = 0}
+index = index + 1
+------ replay on fail -----
+bossList[index] = {target =  "replay2.png", region = Region(1950, 1180, 500, 200), id = "replay", action = 'click', sleep = 0}
+index = index + 1
 
+local sellRegion = Region(1368, 796, 300, 300)
 function boss()
 	while true do
 		local length = table.getn(bossList)
 		setImagePath(imagePath)
+		showBattleResult()
 		
 		for i = 1, length do
 			local t = bossList[i]
+			
 			if (t.action == "click") then
 				if (debug and t.region) then 
 					toast(t.target)
 					t.region:highlight(2)
+				end
+				if t.id == "okGear" then
+					if t.region:exists(Pattern(t.target), 0.1) then
+						findGearStars()
+						if gearStars < 4 then
+							sellRegion:existsClick("sell.png", 0)
+						end
+							
+					end
 				end
 				if (t.region and (t.region):existsClick(t.target, 0)) then
 					wait(t.sleep)
 				end
 			end
 			wait(.5)
+		end
+		-- Check for energy refill
+		if refillEnergy then
+			refillRegion:existsClick(Pattern("Refill.png"), 0.1)
+			refillOkRegion:existsClick(Pattern("RefillOK.png"), 0.1)
 		end
 	end
 end
@@ -190,8 +223,57 @@ function arena()
 	end
 end
 
+function findGearStars()
+	
+	local threeStarLocation = Location(1079, 705)
+	local fourStarLocation = Location(1109, 705)
+	local fiveStarLocation = Location(1139, 705)
+	local sixStarLocation = Location(1169, 705)
+	--locRegion = Region(1079, 705, 5, 5)
+	--locRegion:highlight(1)
+	
+	local r, g, b = getColor(sixStarLocation)
+	if (r == 250 and g == 200 and b == 94) then
+		gearStars = 6
+	else
+		local r, g, b = getColor(fiveStarLocation)
+		if (r == 250 and g == 200 and b == 94) then
+			gearStars = 5
+		else
+			local r, g, b = getColor(fourStarLocation)		
+			if (r == 250 and g == 200 and b == 94) then
+				gearStars = 4
+			else
+				local r, g, b = getColor(threeStarLocation)
+				if (r == 250 and g == 200 and b == 94) then
+					gearStars = 3
+				end
+			end
+		end
+	end	
+	toast(gearStars)
+	
+		
+end
+
+function showBattleResult()
+	local message = ""
+  
+	if timeLimitCheckBox then
+		timeInMinutes = math.floor(timer:check()/60)
+		timeLeft = timeLimit - timeInMinutes
+		message = ("Time Left: " .. timeLeft .. " minutes")
+		resultRegion:highlightOff()
+		resultRegion:highlight(message)
+		if timeLeft <= 0 then
+			print("Timed Run Complete")
+				scriptExit()
+		end
+	end
+end
 
 ---- Main ----
+setHighlightTextStyle(16777215, 4294967295, 12)
 dialogInit()
 addTextView("Choose your mode:")
 newRow()
@@ -204,9 +286,15 @@ addCheckBox("MaxLevelSlot3", "Slot 3 ", false)
 addCheckBox("MaxLevelSlot4", "Slot 4 ", false)
 addRadioButton("Arena", 2)
 addRadioButton("Boss Battle", 3)
+newRow()
+addCheckBox("refillEnergy", "Refill Energy? ", false)
+addCheckBox("timeLimitCheckBox", "Time Limit?", false)
+addEditNumber("timeLimit", 60)
 
 
 dialogShowFullScreen("Dungeon Hunter Champions Bot")
+
+timer = Timer()
 
 if (actionSelect == 2) then
 	arena()
