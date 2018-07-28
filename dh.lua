@@ -10,6 +10,8 @@ local gearStars = 0
 local timer = 0
 local timeLeft = 0
 local timeInMinutes = 0
+local gearAmountKept = 0
+local gearAmountSold = 0
 farmList = {}
 bossList = {}
 arenaList = {}
@@ -19,7 +21,7 @@ imagePath = localPath .. "/" .. "images"
 
 refillRegion = Region(1167, 662, 600, 600)
 refillOkRegion = Region(1107, 660, 600, 600)
-resultRegion = Region(1580, 200, 700, 250)
+resultRegion = Region(2000, 200, 700, 250)
 
 ------ 1 -----
 MaxLevelList[index] = {target =  "MaxLevel.png", region = Region(497, 591, 600, 600), id = "1", action = 'click'}
@@ -157,8 +159,11 @@ function boss()
 				if t.id == "okGear" then
 					if t.region:exists(Pattern(t.target), 0.1) then
 						findGearStars()
-						if gearStars < 4 then
+						if gearStars < KeepGearAbove then
 							sellRegion:existsClick("sell.png", 0)
+							gearAmountSold = gearAmountSold + 1
+						else
+							gearAmountKept = gearAmountKept + 1
 						end
 							
 					end
@@ -270,22 +275,43 @@ function showBattleResult()
 				scriptExit()
 		end
 	end
+	--Boss Battle Message
+	if actionSelect == 3 then
+		message = ("Gear Kept: " .. gearAmountKept .. "   Gear Sold: " .. gearAmountSold .. "")
+		resultRegion:highlightOff()
+		resultRegion:highlight(message)
+	end
 end
 
 ---- Main ----
 setHighlightTextStyle(16777215, 4294967295, 12)
+spinnerMinGearLevel = {
+    "1",
+    "2",
+    "3",
+    "4",
+    "5",
+    "6"
+  }
+  
 dialogInit()
 addTextView("Choose your mode:")
 newRow()
 addRadioGroup("actionSelect", 1)
 addRadioButton("Farming", 1)
+addRadioButton("Arena", 2)
+addRadioButton("Boss Battle", 3)
 newRow()
-addTextView("	Stop if @ Max Level:")
+addTextView("--------Options--------")
+newRow()
+addTextView("If Farming, Stop @ Max Level:")
 addCheckBox("MaxLevelSlot2", "Slot 2 ", false)
 addCheckBox("MaxLevelSlot3", "Slot 3 ", false)
 addCheckBox("MaxLevelSlot4", "Slot 4 ", false)
-addRadioButton("Arena", 2)
-addRadioButton("Boss Battle", 3)
+newRow()
+addTextView("Keep Gear Above ")
+addSpinner("minGearLevel", spinnerMinGearLevel, spinnerMinGearLevel[5])
+addTextView(" Stars in Boss Mode")
 newRow()
 addCheckBox("refillEnergy", "Refill Energy? ", false)
 addCheckBox("timeLimitCheckBox", "Time Limit?", false)
@@ -295,6 +321,21 @@ addEditNumber("timeLimit", 60)
 dialogShowFullScreen("Dungeon Hunter Champions Bot")
 
 timer = Timer()
+
+if minGearLevel == spinnerMinGearLevel[1] then
+	KeepGearAbove = 1
+elseif minGearLevel == spinnerMinGearLevel[2] then
+	KeepGearAbove = 2
+elseif minGearLevel == spinnerMinGearLevel[3] then
+	KeepGearAbove = 3
+elseif minGearLevel == spinnerMinGearLevel[4] then
+	KeepGearAbove = 4
+elseif minGearLevel == spinnerMinGearLevel[5] then
+	KeepGearAbove = 5
+elseif minGearLevel == spinnerMinGearLevel[6] then
+	KeepGearAbove = 6
+end
+	
 
 if (actionSelect == 2) then
 	arena()
