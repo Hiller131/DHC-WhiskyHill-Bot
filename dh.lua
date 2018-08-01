@@ -15,6 +15,7 @@ local gearAmountSold = 0
 farmList = {}
 bossList = {}
 arenaList = {}
+blitzList = {}
 MaxLevelList = {}
 localPath = scriptPath()
 imagePath = localPath .. "/" .. "images"
@@ -228,6 +229,43 @@ function arena()
 	end
 end
 
+index = 1
+------ battle  -----
+blitzList[index] = {target =  "battle.png", region = Region(2177, 1168, 300, 300), id = "battle", action = 'click', sleep = 0}
+index = index + 1
+------ next  -----
+blitzList[index] = {target =  "next.png", region = Region(1925, 1138, 300, 300), id = "next", action = 'click', sleep = 0}
+index = index + 1
+------ ok -----
+blitzList[index] = {target =  "ok.png", region = Region(1141, 838, 300, 300), id = "ok", action = 'click', sleep = 0}
+index = index + 1
+------ Auto On -----
+blitzList[index] = {target =  "AutoOn.png", region = Region(916, 984, 600, 600), id = "AutoOn", action = 'click', sleep = 0}
+index = index + 1
+
+function blitz()
+	while true do
+		local length = table.getn(blitzList)
+		
+		setImagePath(imagePath)
+		
+		for i = 1, length do
+			local t = blitzList[i]
+			if (t.action == "click") then
+				if (debug and t.region) then 
+					toast(t.target)
+					t.region:highlight(0.2)
+					wait(2)
+				end
+				if (t.region and (t.region):existsClick(t.target, 0)) then
+					wait(t.sleep)
+				end
+			end
+			wait(.5)
+		end
+	end
+end
+
 function findGearStars()
 	
 	local threeStarLocation = Location(1079, 705)
@@ -301,6 +339,7 @@ addRadioGroup("actionSelect", 1)
 addRadioButton("Farming", 1)
 addRadioButton("Arena", 2)
 addRadioButton("Boss Battle", 3)
+addRadioButton("Blitz", 4)
 newRow()
 addTextView("--------Options--------")
 newRow()
@@ -340,7 +379,9 @@ end
 if (actionSelect == 2) then
 	arena()
 elseif (actionSelect == 3) then
-		boss()
+	boss()
+elseif (actionSelect == 4) then
+	blitz()
 else
 	farm()
 end
