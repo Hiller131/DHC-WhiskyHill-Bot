@@ -226,11 +226,7 @@ function arena()
 			end
 			wait(.5)
 		end
-		if refillEnergy then
-			refillRegion:existsClick(Pattern("Refill.png"), 0.1)
-			refillOkRegion:existsClick(Pattern("RefillOK.png"), 0.1)
-		end
-	end
+	end	
 end
 
 index = 1
@@ -266,6 +262,10 @@ function blitz()
 				end
 			end
 			wait(.5)
+		end
+		if refillEnergy then
+			refillRegion:existsClick(Pattern("Refill.png"), 0.1)
+			refillOkRegion:existsClick(Pattern("RefillOK.png"), 0.1)
 		end
 	end
 end
