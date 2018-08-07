@@ -12,6 +12,7 @@ local timeLeft = 0
 local timeInMinutes = 0
 local gearAmountKept = 0
 local gearAmountSold = 0
+local defeatedCount = 0
 farmList = {}
 bossList = {}
 arenaList = {}
@@ -22,7 +23,7 @@ imagePath = localPath .. "/" .. "images"
 
 refillRegion = Region(1167, 662, 600, 600)
 refillOkRegion = Region(1107, 660, 600, 600)
-resultRegion = Region(2000, 200, 700, 250)
+resultRegion = Region(1800, 200, 700, 250)
 
 ------ 1 -----
 MaxLevelList[index] = {target =  "MaxLevel.png", region = Region(497, 591, 600, 600), id = "1", action = 'click'}
@@ -64,6 +65,9 @@ farmList[index] = {target =  "LevelOk.png", region = Region(1923, 1016, 600, 600
 index = index + 1
 ------ Auto On -----
 farmList[index] = {target =  "AutoOn.png", region = Region(916, 984, 600, 600), id = "AutoOn", action = 'click', sleep = 0}
+index = index + 1
+------ reconnect -----
+farmList[index] = {target =  "Reconnect.png", region = Region(1074, 734, 400, 400), id = "reconnect", action = 'click', sleep = 0}
 index = index + 1
 
 
@@ -139,7 +143,10 @@ index = index + 1
 bossList[index] = {target =  "AutoOn.png", region = Region(916, 984, 600, 600), id = "AutoOn", action = 'click', sleep = 0}
 index = index + 1
 ------ replay on fail -----
-bossList[index] = {target =  "replay2.png", region = Region(1950, 1180, 500, 200), id = "replay", action = 'click', sleep = 0}
+bossList[index] = {target =  "replay2.png", region = Region(1950, 1180, 500, 200), id = "replayOnFail", action = 'click', sleep = 0}
+index = index + 1
+------ reconnect -----
+bossList[index] = {target =  "Reconnect.png", region = Region(1074, 734, 400, 400), id = "reconnect", action = 'click', sleep = 0}
 index = index + 1
 
 local sellRegion = Region(1368, 796, 300, 300)
@@ -156,6 +163,11 @@ function boss()
 				if (debug and t.region) then 
 					toast(t.target)
 					t.region:highlight(2)
+				end
+				if t.id == "replayOnFail" then
+					if (t.region):exists(t.target, 0) then
+						defeatedCount = defeatedCount + 1
+					end
 				end
 				if t.id == "okGear" then
 					if t.region:exists(Pattern(t.target), 0.1) then
@@ -205,6 +217,9 @@ index = index + 1
 ------ arena_refresh -----
 arenaList[index] = {target =  "arena_refresh.png", region = Region(2190, 1261, 250, 250), id = "arena_refresh", action = 'click', sleep = 0}
 index = index + 1
+------ reconnect -----
+arenaList[index] = {target =  "Reconnect.png", region = Region(1074, 734, 400, 400), id = "reconnect", action = 'click', sleep = 0}
+index = index + 1
 
 function arena()
 	while true do
@@ -241,6 +256,9 @@ blitzList[index] = {target =  "ok.png", region = Region(1141, 838, 300, 300), id
 index = index + 1
 ------ Auto On -----
 blitzList[index] = {target =  "AutoOn.png", region = Region(916, 984, 600, 600), id = "AutoOn", action = 'click', sleep = 0}
+index = index + 1
+------ reconnect -----
+blitzList[index] = {target =  "Reconnect.png", region = Region(1074, 734, 400, 400), id = "reconnect", action = 'click', sleep = 0}
 index = index + 1
 
 function blitz()
@@ -319,7 +337,7 @@ function showBattleResult()
 	end
 	--Boss Battle Message
 	if actionSelect == 3 then
-		message = ("Gear Kept: " .. gearAmountKept .. "   Gear Sold: " .. gearAmountSold .. "")
+		message = ("Gear Kept: " .. gearAmountKept .. "   Gear Sold: " .. gearAmountSold .. "   Defeated: " .. defeatedCount .. "")
 		resultRegion:highlightOff()
 		resultRegion:highlight(message)
 	end
