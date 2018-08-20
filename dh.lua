@@ -13,6 +13,7 @@ local timeInMinutes = 0
 local gearAmountKept = 0
 local gearAmountSold = 0
 local defeatedCount = 0
+local victoryCount = 0
 farmList = {}
 bossList = {}
 arenaList = {}
@@ -23,7 +24,7 @@ imagePath = localPath .. "/" .. "images"
 
 refillRegion = Region(1167, 662, 600, 600)
 refillOkRegion = Region(1107, 660, 600, 600)
-resultRegion = Region(1800, 200, 700, 250)
+resultRegion = Region(50, 50, 700, 250)
 
 ------ 1 -----
 MaxLevelList[index] = {target =  "MaxLevel.png", region = Region(497, 591, 600, 600), id = "1", action = 'click'}
@@ -118,9 +119,9 @@ index = index + 1
 ------ yes -----
 bossList[index] = {target =  "yes.png", region = Region(1366, 791, 300, 300), id = "yes", action = 'click', sleep = 0}
 index = index + 1
------- sell small -----
---bossList[index] = {target =  "sell_small.png", region = Region(848, 853, 300, 300), id = "sell_small", action = 'click', sleep = 0}
---index = index + 1
+------ Sell Confirm -----
+bossList[index] = {target =  "sellConfirm.png", region = Region(1320, 730, 400, 400), id = "sellConfirm", action = 'click', sleep = 0}
+index = index + 1
 ------ sell -----
 --bossList[index] = {target =  "sell.png", region = Region(1368, 796, 300, 300), id = "sell", action = 'click', sleep = 0}
 --index = index + 1
@@ -149,7 +150,7 @@ index = index + 1
 bossList[index] = {target =  "Reconnect.png", region = Region(1074, 734, 400, 400), id = "reconnect", action = 'click', sleep = 0}
 index = index + 1
 
-local sellRegion = Region(1368, 796, 300, 300)
+local sellRegion = Region(713, 794, 400, 400)
 function boss()
 	while true do
 		local length = table.getn(bossList)
@@ -172,16 +173,22 @@ function boss()
 				if t.id == "okGear" then
 					if t.region:exists(Pattern(t.target), 0.1) then
 						findGearStars()
-						if gearStars < KeepGearAbove then
-							sellRegion:existsClick("sell.png", 0)
+						if gearStars < KeepGearAbove then					
+							sellRegion:existsClick(("sell.png"), 0.1)
 							gearAmountSold = gearAmountSold + 1
+							victoryCount = victoryCount + 1
 						else
 							gearAmountKept = gearAmountKept + 1
+							victoryCount = victoryCount + 1
 						end
 							
 					end
+				elseif t.id == "ok" then
+					if (t.region and (t.region):exists(t.target, 0)) then
+						victoryCount = victoryCount + 1
+					end
 				end
-				if (t.region and (t.region):existsClick(t.target, 0)) then
+				if (t.region and (t.region):existsClick(Pattern(t.target):similar(imgAccuracy), 0)) then
 					wait(t.sleep)
 				end
 			end
@@ -298,24 +305,30 @@ function findGearStars()
 	--locRegion:highlight(1)
 	
 	local r, g, b = getColor(sixStarLocation)
-	if (r == 250 and g == 200 and b == 94) then
+	--toast("r:" .. r .. "  g:" .. g .. "  b:" .. b)
+	if (r > 245 and g > 190 and b > 90) then
 		gearStars = 6
+		--toast("r:" .. r .. "  g:" .. g .. "  b:" .. b)
 	else
 		local r, g, b = getColor(fiveStarLocation)
-		if (r == 250 and g == 200 and b == 94) then
+		if (r > 245 and g > 190 and b > 90) then
 			gearStars = 5
+			--toast("r:" .. r .. "  g:" .. g .. "  b:" .. b)
 		else
 			local r, g, b = getColor(fourStarLocation)		
-			if (r == 250 and g == 200 and b == 94) then
+			if (r > 245 and g > 190 and b > 90) then
 				gearStars = 4
+				--toast("r:" .. r .. "  g:" .. g .. "  b:" .. b)
 			else
 				local r, g, b = getColor(threeStarLocation)
-				if (r == 250 and g == 200 and b == 94) then
+				if (r > 245 and g > 190 and b > 90) then
 					gearStars = 3
+					--toast("r:" .. r .. "  g:" .. g .. "  b:" .. b)
 				end
 			end
 		end
 	end	
+	
 	toast(gearStars)
 	
 		
@@ -337,7 +350,7 @@ function showBattleResult()
 	end
 	--Boss Battle Message
 	if actionSelect == 3 then
-		message = ("Gear Kept: " .. gearAmountKept .. "   Gear Sold: " .. gearAmountSold .. "   Defeated: " .. defeatedCount .. "")
+		message = ("Gear Kept: " .. gearAmountKept .. '\n' .. "Gear Sold: " .. gearAmountSold .. '\n' .. "Victory: " .. victoryCount .. '\n'.. "".. "Defeated: " .. defeatedCount .. "")
 		resultRegion:highlightOff()
 		resultRegion:highlight(message)
 	end
@@ -370,13 +383,15 @@ addCheckBox("MaxLevelSlot2", "Slot 2 ", false)
 addCheckBox("MaxLevelSlot3", "Slot 3 ", false)
 addCheckBox("MaxLevelSlot4", "Slot 4 ", false)
 newRow()
-addTextView("Keep Gear Above ")
+addTextView("Min Gear Stars in Boss Mode: ")
 addSpinner("minGearLevel", spinnerMinGearLevel, spinnerMinGearLevel[5])
-addTextView(" Stars in Boss Mode")
 newRow()
 addCheckBox("refillEnergy", "Refill Energy? ", false)
 addCheckBox("timeLimitCheckBox", "Time Limit?", false)
 addEditNumber("timeLimit", 60)
+newRow()
+addTextView("Image Accuracy (Between 0 and 1): ")
+addEditNumber("imgAccuracy", .9)
 
 
 dialogShowFullScreen("Dungeon Hunter Champions Bot")
