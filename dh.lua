@@ -159,6 +159,7 @@ function boss()
 		
 		for i = 1, length do
 			local t = bossList[i]
+			gearStars = 0
 			
 			if (t.action == "click") then
 				if (debug and t.region) then 
@@ -167,7 +168,9 @@ function boss()
 				end
 				if t.id == "replayOnFail" then
 					if (t.region):exists(t.target, 0) then
-						defeatedCount = defeatedCount + 1
+						if not refillRegion:exists(Pattern("Refill.png"), 0.1) then
+							defeatedCount = defeatedCount + 1
+						end
 					end
 				end
 				if t.id == "okGear" then
@@ -181,7 +184,6 @@ function boss()
 							gearAmountKept = gearAmountKept + 1
 							victoryCount = victoryCount + 1
 						end
-							
 					end
 				elseif t.id == "ok" then
 					if (t.region and (t.region):exists(t.target, 0)) then
