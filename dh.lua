@@ -14,6 +14,7 @@ local gearAmountKept = 0
 local gearAmountSold = 0
 local defeatedCount = 0
 local victoryCount = 0
+local gearEvalResult = "keep"
 farmList = {}
 bossList = {}
 arenaList = {}
@@ -44,19 +45,16 @@ index = index + 1
 farmList[index] = {target =  "yes.png", region = Region(1366, 791, 300, 300), id = "yes", action = 'click', sleep = 0}
 index = index + 1
 ------ sell small -----
-farmList[index] = {target =  "sell_small.png", region = Region(848, 853, 300, 300), id = "sell_small", action = 'click', sleep = 0}
+farmList[index] = {target =  "sellConfirm.png", region = Region(1320, 730, 400, 400), id = "sellConfirm", action = 'click', sleep = 0}
 index = index + 1
 ------ sell -----
-farmList[index] = {target =  "sell.png", region = Region(1368, 796, 300, 300), id = "sell", action = 'click', sleep = 0}
+farmList[index] = {target =  "sell.png", region = Region(713, 794, 400, 400), id = "sell", action = 'click', sleep = 0}
 index = index + 1
 ------ close -----
 farmList[index] = {target =  "close.png", region = Region(1858, 95, 300, 300), id = "close", action = 'click', sleep = 0}
 index = index + 1
 ------ replay -----
 farmList[index] = {target =  "replay.png", region = Region(1547, 1155, 300, 300), id = "replay", action = 'click', sleep = 0}
-index = index + 1
------- sell small2 -----
-farmList[index] = {target =  "sell_small2.png", region = Region(829, 841, 300, 300), id = "sell_small2", action = 'click', sleep = 0}
 index = index + 1
 ------ ok -----
 farmList[index] = {target =  "ok.png", region = Region(1141, 838, 300, 300), id = "ok", action = 'click', sleep = 0}
@@ -122,18 +120,12 @@ index = index + 1
 ------ Sell Confirm -----
 bossList[index] = {target =  "sellConfirm.png", region = Region(1320, 730, 400, 400), id = "sellConfirm", action = 'click', sleep = 0}
 index = index + 1
------- sell -----
---bossList[index] = {target =  "sell.png", region = Region(1368, 796, 300, 300), id = "sell", action = 'click', sleep = 0}
---index = index + 1
 ------ close -----
 bossList[index] = {target =  "close.png", region = Region(1858, 95, 300, 300), id = "close", action = 'click', sleep = 0}
 index = index + 1
 ------ replay -----
 bossList[index] = {target =  "replay2.png", region = Region(1300, 1180, 300, 300), id = "replay", action = 'click', sleep = 00}
 index = index + 1
------- sell small2 -----
---bossList[index] = {target =  "sell_small2.png", region = Region(829, 841, 300, 300), id = "sell_small2", action = 'click', sleep = 0}
---index = index + 1
 ------ ok -----
 bossList[index] = {target =  "ok.png", region = Region(1141, 838, 300, 300), id = "ok", action = 'click', sleep = 0}
 index = index + 1
@@ -176,7 +168,11 @@ function boss()
 				if t.id == "okGear" then
 					if t.region:exists(Pattern(t.target), 0.1) then
 						findGearStars()
-						if gearStars < KeepGearAbove then					
+						if flatMainStatEval then
+							gearEvaluation()
+						end
+						
+						if (gearStars < KeepGearAbove) or (gearEvalResult == "sell") then					
 							sellRegion:existsClick(("sell.png"), 0.1)
 							gearAmountSold = gearAmountSold + 1
 							victoryCount = victoryCount + 1
@@ -336,6 +332,18 @@ function findGearStars()
 		
 end
 
+local gearEvalRegion = Region(1340, 430, 500, 100)
+local mainStatPercentRegion = Region(1360, 520, 400, 70)
+function gearEvaluation()
+	if gearEvalRegion:exists("gearGlove.png", 0.1) or gearEvalRegion:exists("gearShoulder.png", 0.1) or gearEvalRegion:exists("gearBracer.png", 0.1) then
+		if (not mainStatPercentRegion:exists("mainStatPercent.png", 0.1)) or mainStatPercentRegion:exists("mainStatMoveSpeed.png") then
+			gearEvalResult = "sell"
+		else
+			gearEvalResult = "keep"
+		end
+	end
+end
+
 function showBattleResult()
 	local message = ""
   
@@ -394,7 +402,8 @@ addEditNumber("timeLimit", 60)
 newRow()
 addTextView("Image Accuracy (Between 0 and 1): ")
 addEditNumber("imgAccuracy", .9)
-
+newRow()
+addCheckBox("flatMainStatEval", "Flat Main Stat Eval? ", false)
 
 dialogShowFullScreen("Dungeon Hunter Champions Bot")
 
