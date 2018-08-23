@@ -336,7 +336,7 @@ local gearEvalRegion = Region(1340, 430, 500, 100)
 local mainStatPercentRegion = Region(1360, 520, 400, 70)
 function gearEvaluation()
 	if gearEvalRegion:exists("gearGlove.png", 0.1) or gearEvalRegion:exists("gearShoulder.png", 0.1) or gearEvalRegion:exists("gearBracer.png", 0.1) then
-		if (not mainStatPercentRegion:exists("mainStatPercent.png", 0.1)) or mainStatPercentRegion:exists("mainStatMoveSpeed.png") then
+		if (not mainStatPercentRegion:exists("MainStatPercent.png", 0.1)) or (mainStatPercentRegion:exists("MainStatMoveSpeed.png", 0.1)) then
 			gearEvalResult = "sell"
 		else
 			gearEvalResult = "keep"
